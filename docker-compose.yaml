@@ -1,0 +1,11 @@
+services:
+  streamlit_app:
+    build: .
+    ports:
+      - "8501:8501"
+    restart: always
+    volumes:
+      - .:/app
+    environment:
+      - CEIC_USERNAME=${CEIC_USERNAME}
+      - CEIC_PASSWORD=${CEIC_PASSWORD}

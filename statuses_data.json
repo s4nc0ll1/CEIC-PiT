@@ -1,0 +1,14 @@
+[
+    {
+        "id": "T",
+        "name": "Active"
+    },
+    {
+        "id": "C",
+        "name": "Discontinued"
+    },
+    {
+        "id": "B",
+        "name": "Rebased"
+    }
+]

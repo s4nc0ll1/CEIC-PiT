@@ -1,0 +1,38 @@
+[
+    {
+        "id": "D",
+        "name": "DAILY"
+    },
+    {
+        "id": "W",
+        "name": "WEEKLY"
+    },
+    {
+        "id": "M",
+        "name": "MONTHLY"
+    },
+    {
+        "id": "Q",
+        "name": "QUARTERLY"
+    },
+    {
+        "id": "H",
+        "name": "SEMIANNUALLY"
+    },
+    {
+        "id": "Y",
+        "name": "YEARLY"
+    },
+    {
+        "id": "V",
+        "name": "TRIENNIAL"
+    },
+    {
+        "id": "Z",
+        "name": "QUINQUENNIALLY"
+    },
+    {
+        "id": "T",
+        "name": "DECADAL"
+    }
+]

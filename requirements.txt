@@ -1,0 +1,8 @@
+--extra-index-url https://downloads.ceicdata.com/python
+ceic_api_client
+matplotlib
+numpy
+pandas
+plotly
+seaborn
+streamlit
