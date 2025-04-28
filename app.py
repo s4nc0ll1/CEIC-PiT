@@ -12,6 +12,7 @@ import re # Import regex for ID validation
 
 
 #CONSTANTS
+FILTERS_DIR = "filters"
 JSON_FILES = ["geo_data.json", "frequencies_data.json", "statuses_data.json"]
 
 #Streamlit page configuration
@@ -43,6 +44,7 @@ def initialize_session_state():
 
 
 # Helper function to load JSON data safely
+@st.cache_data(show_spinner=False)
 def load_json_data(json_file):
     try:
         with open(json_file, "r", encoding="utf-8") as file:
@@ -65,10 +67,11 @@ def load_json_data(json_file):
 def load_json_dropdown(json_files):
     selected_values = {}
     for json_file in json_files:
-        data = load_json_data(json_file) # Use the helper function
+        full_path = os.path.join(FILTERS_DIR, json_file)
+        data = load_json_data(full_path) # Use the helper function
 
         if not data:
-             st.warning(f"No options found or loaded from {json_file}")
+             st.warning(f"No options found or loaded from {full_path}")
              selected_values[json_file] = None
              continue # Skip to the next file
 
@@ -78,14 +81,14 @@ def load_json_dropdown(json_files):
             if isinstance(data, list):
                 data = [item for item in data if item.get("type") == "COUNTRY"]
             else:
-                 st.warning(f"Unexpected data format in {json_file}")
+                 st.warning(f"Unexpected data format in {full_path}")
                  selected_values[json_file] = None
                  continue
 
 
         # Ensure data is a list and has at least one item before accessing index 0
         if not isinstance(data, list) or not data:
-             st.warning(f"No valid options found in {json_file}")
+             st.warning(f"No valid options found in {full_path}")
              selected_values[json_file] = None
              continue
 
@@ -98,12 +101,12 @@ def load_json_dropdown(json_files):
         elif "title" in first_item:
             key_name = "title"
         else:
-             st.warning(f"Could not find 'name' or 'title' key in the first item of {json_file}")
+             st.warning(f"Could not find 'name' or 'title' key in the first item of {full_path}")
              selected_values[json_file] = None
              continue
 
         if "id" not in first_item:
-            st.warning(f"Could not find 'id' key in the first item of {json_file}")
+            st.warning(f"Could not find 'id' key in the first item of {full_path}")
             selected_values[json_file] = None
             continue
 
@@ -112,7 +115,7 @@ def load_json_dropdown(json_files):
 
         # Ensure options dictionary is not empty after processing
         if not options:
-             st.warning(f"Failed to extract valid options from {json_file}")
+             st.warning(f"Failed to extract valid options from {full_path}")
              selected_values[json_file] = None
              continue
 
@@ -458,7 +461,7 @@ def login_page():
     col1, col2, col3 = st.columns([2, 1, 2])
 
     with col2:
-        st.image("ceic.webp", width=250)
+        st.image("images/ceic.webp", width=250)
     
     col1, col2, col3 = st.columns([1, 1, 1])
 
@@ -499,7 +502,7 @@ def main_app():
 
     # Sidebar
     with st.sidebar:
-        st.image("ceic.webp", width=250)
+        st.image("images/ceic.webp", width=250)
         st.title("Data Loading Options")
 
         # --- Direct Series ID Input ---
