@@ -16,6 +16,15 @@ JSON_FILES = ["geo_data.json", "frequencies_data.json", "statuses_data.json"]
 
 #Streamlit page configuration
 st.set_page_config(page_title="CEIC Series Data Visualizer", layout="wide")
+st.markdown(
+        """
+        <style>
+        .stApp { background-color: #E6E6FA; min-height: 100vh; }
+        .stApp > header { background-color: transparent; }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
 def initialize_session_state():
     if 'logged_in' not in st.session_state:
@@ -240,9 +249,7 @@ def search_series(keyword, dropdown):
                                 series_id = series.metadata.id
                                 label = f"{name} (ID: {series_id})"
                                 series_options[label] = series_id
-                            # Optionally log items that don't have expected structure
-                            # else:
-                            #     print(f"Skipping item with unexpected structure: {series}")
+
 
                 # Updates the session_state
                 if series_options:
@@ -374,7 +381,8 @@ def display_visualizations():
 
     else:
         st.info("Time series data (latest revisions) not available for this series.")
-
+    
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
     # Vintages related visualizations (require vintages_data)
     if vintages_fetched:
@@ -385,7 +393,8 @@ def display_visualizations():
              st.dataframe(df_styled)
         else:
              st.error("Failed to style vintages table.") # Should not happen if df_reversed is valid
-
+        
+        st.markdown("<br><br>", unsafe_allow_html=True)
 
         # Vintages Heatmap
         st.subheader("Heatmap of Vintage Changes")
@@ -397,9 +406,8 @@ def display_visualizations():
                  st.error("Failed to generate vintages heatmap.") # Should not happen if df_reversed is valid
         except Exception as e:
              st.error(f"Error plotting heatmap: {e}")
-             # plt.close(fig_heatmap) # Close the figure to prevent memory issues if plotting failed
-             # print(f"Traceback plotting heatmap: {sys.exc_info()[2]}") # Debugging
-
+        
+        st.markdown("<br><br>", unsafe_allow_html=True)
 
         # Animated Timeseries Vintages
         st.subheader("Animated Timeseries Vintages")
@@ -411,8 +419,8 @@ def display_visualizations():
                  st.error("Failed to generate animated vintages plot.") # Should not happen if df_reversed is valid
         except Exception as e:
              st.error(f"Error plotting animated vintages: {e}")
-             # print(f"Traceback plotting animated: {sys.exc_info()[2]}") # Debugging
-
+        
+        st.markdown("<br><br>", unsafe_allow_html=True)
 
         # Vintage comparison Between dates
         st.subheader("Vintage Comparison Between Two Dates")
@@ -424,8 +432,8 @@ def display_visualizations():
                  st.error("Failed to generate vintage comparison plot.") # Should not happen if df_reversed is valid
         except Exception as e:
              st.error(f"Error plotting vintage comparison: {e}")
-             # print(f"Traceback plotting comparison: {sys.exc_info()[2]}") # Debugging
-
+        
+        st.markdown("<br><br>", unsafe_allow_html=True)
 
         # Difference between first and last
         st.subheader("Difference Between Last and First Available Values per Vintage")
@@ -437,8 +445,6 @@ def display_visualizations():
                  st.error("Failed to generate vintage differences plot.") # Should not happen if df_reversed is valid
         except Exception as e:
              st.error(f"Error plotting vintage differences: {e}")
-             # plt.close(fig_bar) # Close the figure to prevent memory issues if plotting failed
-             # print(f"Traceback plotting differences: {sys.exc_info()[2]}") # Debugging
 
     else:
         st.info("Vintages data not available for this series.")
@@ -448,31 +454,43 @@ def display_visualizations():
 
 
 def login_page():
-    st.title("CEIC Data Visualizer Login")
 
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
+    col1, col2, col3 = st.columns([2, 1, 2])
 
-    if st.button("Login"):
-        if not username or not password:
-            st.warning("Please enter both username and password.")
-            return
+    with col2:
+        st.image("ceic.webp", width=250)
+    
+    col1, col2, col3 = st.columns([1, 1, 1])
 
-        with st.spinner("Logging in..."):
-            try:
-                # Attempt to login to CEIC
-                # Set server URL first if not already set globally by pyceic
-                # Ceic.set_server("https://api.ceicdata.com/v2") # Assuming default is fine or set elsewhere
-                client = Ceic.login(username, password)
-                st.session_state.ceic_client = client
-                st.session_state.logged_in = True
-                st.success("Login successful!")
-                # Rerun to switch to the main app view
-                st.rerun()
-            except Exception as e:
-                st.error(f"Login failed: {e}. Please check your credentials and API server configuration.")
-                st.session_state.logged_in = False
-                st.session_state.ceic_client = None
+    with col2:
+        st.title("Data Visualizer Login")
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    
+    with col2:
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+
+        if st.button("Login"):
+            if not username or not password:
+                st.warning("Please enter both username and password.")
+                return
+
+            with st.spinner("Logging in..."):
+                try:
+                    # Attempt to login to CEIC
+                    # Set server URL first if not already set globally by pyceic
+                    # Ceic.set_server("https://api.ceicdata.com/v2") # Assuming default is fine or set elsewhere
+                    client = Ceic.login(username, password)
+                    st.session_state.ceic_client = client
+                    st.session_state.logged_in = True
+                    st.success("Login successful!")
+                    # Rerun to switch to the main app view
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Login failed: {e}. Please check your credentials and API server configuration.")
+                    st.session_state.logged_in = False
+                    st.session_state.ceic_client = None
 
 
 def main_app():
@@ -481,13 +499,14 @@ def main_app():
 
     # Sidebar
     with st.sidebar:
+        st.image("ceic.webp", width=250)
         st.title("Data Loading Options")
 
         # --- Direct Series ID Input ---
         st.subheader("Load by Series ID")
         direct_series_id_input = st.text_input("Enter Series ID", key="direct_id_input_sidebar").strip()
         # Button to trigger loading by ID
-        load_id_button = st.button("Load Series by ID", disabled=not direct_series_id_input)
+        load_id_button = st.button("Load", disabled=not direct_series_id_input)
 
         st.markdown("---") # Separator
 
@@ -499,7 +518,7 @@ def main_app():
         # Determine if keyword search filters are valid (keyword is required)
         dropdown_valid = all(value is not None for value in dropdown.values())
         search_button_disabled = not (keyword and dropdown_valid)
-        search_button = st.button("Search Series by Filters", disabled=search_button_disabled)
+        search_button = st.button("Search", disabled=search_button_disabled)
 
 
     # --- Logic triggered by sidebar buttons ---
@@ -515,12 +534,9 @@ def main_app():
         search_series(keyword, dropdown)
 
     # --- Series Selection Dropdown (always visible if options exist) ---
-    # This section displays the results and updates st.session_state.series_id_for_viz
-    # whenever a selection is made *in the dropdown*.
     display_series_selection()
 
     # --- Load Data Button (uses the ID from st.session_state.series_id_for_viz) ---
-    # The Load Data button is enabled if series_id_for_viz is set (meaning an ID was loaded or selected)
     load_data_disabled = not st.session_state.series_id_for_viz
     load_data_button = st.button("Load Data", disabled=load_data_disabled)
 
@@ -531,14 +547,7 @@ def main_app():
 
 
 def main():
-    # Ensure required JSON files exist before initializing or running the app
-    # The load_json_data function called within load_json_dropdown will also handle this
-    # but a check here ensures we stop early if any are missing.
-    # for fname in JSON_FILES:
-    #     if not os.path.exists(fname):
-    #         st.error(f"Required file '{fname}' not found. Please ensure the JSON files are in the same directory as app.py.")
-    #         st.stop() # Stop execution if files are missing
-
+    
     initialize_session_state()
 
     if st.session_state.logged_in:
