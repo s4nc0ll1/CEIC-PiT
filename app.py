@@ -14,9 +14,14 @@ import re # Import regex for ID validation
 #CONSTANTS
 FILTERS_DIR = "filters"
 JSON_FILES = ["geo_data.json", "frequencies_data.json", "statuses_data.json"]
+LABEL_MAP = {
+    "geo_data.json": "Country",
+    "frequencies_data.json": "Frequency",
+    "statuses_data.json": "Status"
+}
 
 #Streamlit page configuration
-st.set_page_config(page_title="CEIC Series Data Visualizer", layout="wide")
+st.set_page_config(page_title="CEIC Point-in-Time Data Explorer", layout="wide")
 st.markdown(
         """
         <style>
@@ -119,13 +124,10 @@ def load_json_dropdown(json_files):
              selected_values[json_file] = None
              continue
 
-        # Dropdown options
-        # Use a unique key for each selectbox based on the filename
+        label = LABEL_MAP.get(json_file, json_file.replace('_data.json', '').capitalize())
         selectbox_key = f"selectbox_{json_file.replace('_data.json', '')}"
-        # Use options.keys() directly, Streamlit handles the first item as default if no state key
-        selected_option = st.selectbox(f"Select {json_file.replace('_data.json', '').capitalize()}:", list(options.keys()), key=selectbox_key)
+        selected_option = st.selectbox(f"Select {label}:", list(options.keys()), key=selectbox_key)
         selected_values[json_file] = options[selected_option]
-
 
     return selected_values
 
@@ -347,6 +349,34 @@ def display_visualizations():
     # Fetch data using threading
     with st.spinner(f"Fetching data for Series ID {series_id_to_visualize}..."):
         visualizer.fetch_all_data()
+    
+    if visualizer.metadata is not None:
+        st.subheader("Series Metadata")
+        meta = visualizer.metadata # Shorter reference
+        
+        # Display key metadata fields using st.write with markdown for bolding
+        st.write(f"**ID:** {getattr(meta, 'id', 'N/A')}")
+        st.write(f"**Name:** {getattr(meta, 'name', 'N/A')}")
+        
+        # Safely access nested attributes like country name, frequency name, source name
+        country_name = getattr(getattr(meta, 'country', None), 'name', 'N/A')
+        st.write(f"**Country:** {country_name}")
+        
+        frequency_name = getattr(getattr(meta, 'frequency', None), 'name', 'N/A')
+        st.write(f"**Frequency:** {frequency_name}")
+        
+        source_name = getattr(getattr(meta, 'source', None), 'name', 'N/A')
+        st.write(f"**Source:** {source_name}")
+        
+        #st.write(f"**Units:** {getattr(meta, 'units', 'N/A')}")
+        #st.write(f"**Description:** {getattr(meta, 'description', 'N/A')}")
+        st.write(f"**Last Update Time:** {getattr(meta, 'last_update_time', 'N/A')}")
+        st.write(f"**Last Value:** {getattr(meta, 'last_value', 'N/A')}")
+        
+        st.markdown("---") # Add a separator after metadata
+        
+    else:
+         st.error(f"Failed to fetch metadata for Series ID {series_id_to_visualize}. Please check the ID and your subscription access.")
 
     # Check for errors during fetching
     if visualizer.metadata is None:
@@ -365,7 +395,9 @@ def display_visualizations():
 
     # Time series data 
     if data_fetched:
-        st.subheader("Time Series Data")
+        st.subheader("Revised Time Series data")
+        st.markdown("The CEIC API allows you to access the normal up-to-date version of the series with the latest revisions applied to the selected economic variable.")
+        
         df_series = visualizer.process_series_data()
         if df_series is not None and not df_series.empty:
             try:
@@ -390,7 +422,9 @@ def display_visualizations():
     # Vintages related visualizations (require vintages_data)
     if vintages_fetched:
         # Vintages Table
-        st.subheader("Vintages Table with Highlights")
+        st.subheader("Vintages Matrix")
+        st.markdown("The dataframe represents the latest vintages showing **timepoint dates** as rows and **update_dates** as columns. Timepoint changes (revisions) are highlighted in red")
+
         df_styled = visualizer.style_vintages_table()
         if df_styled is not None:
              st.dataframe(df_styled)
@@ -463,10 +497,10 @@ def login_page():
     with col2:
         st.image("images/ceic.webp", width=250)
     
-    col1, col2, col3 = st.columns([1, 1, 1])
+    col1, col2, col3 = st.columns([2, 1.5, 1.5])
 
     with col2:
-        st.title("Data Visualizer Login")
+        st.title(" Point-in-Time")
     
     col1, col2, col3 = st.columns([1, 2, 1])
     
@@ -498,7 +532,7 @@ def login_page():
 
 def main_app():
     # Title
-    st.title("CEIC Series Data Visualizer")
+    st.title("CEIC Point-in-Time Data Explorer")
 
     # Sidebar
     with st.sidebar:
