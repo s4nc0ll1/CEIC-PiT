@@ -497,10 +497,10 @@ def login_page():
     with col2:
         st.image("images/ceic.webp", width=250)
     
-    col1, col2, col3 = st.columns([2, 1.5, 1.5])
+    col1, col2, col3 = st.columns([2.5, 3, 2])
 
     with col2:
-        st.title(" Point-in-Time")
+        st.title("Point-in-Time Data Explorer")
     
     col1, col2, col3 = st.columns([1, 2, 1])
     
