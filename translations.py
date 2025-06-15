@@ -95,6 +95,9 @@ TRANSLATIONS = {
         "Select {}:": "Select {}:",
         "Could not generate Python script: 'series.py' is missing.": "Could not generate Python script: 'series.py' is missing.",
         "Found {} series matching your criteria.": "Found {} series matching your criteria.",
+        "Vintage Options": "Vintage Options",
+        "All": "All",
+        "Check to load all historical revisions (may be slower)": "Check to load all historical revisions (may be slower)",
 
     },
     "CN": {
@@ -176,7 +179,6 @@ TRANSLATIONS = {
         "View Generated Python Script": "查看生成的 Python 脚本",
         "Python Script": "Python 脚本",
         "Load a series to enable script download.": "加载序列以启用脚本下载。",
-        "📊 R Notebook": "📊 R 笔记本",
         "R notebook functionality coming soon! This will show or allow download of a .Rmd or .R file.": "R 笔记本功能即将推出！这将显示或允许下载 .Rmd 或 .R 文件。",
         "Error: Required file '{}' not found.": "错误：未找到所需文件“{}”。",
         "Error: Could not decode JSON from '{}'. Please check the file content.": "错误：无法从“{}”解码 JSON。请检查文件内容。",
@@ -192,6 +194,9 @@ TRANSLATIONS = {
         "Select First Date": "选择第一个日期",
         "Select Second Date": "选择第二个日期",
         "Found {} series matching your criteria.": "找到 {} 个符合您条件的系列",
-        "Could not generate comparison for selected dates.": "无法为选定日期生成比较图表。"
+        "Could not generate comparison for selected dates.": "无法为选定日期生成比较图表。",
+        "Vintage Options": "历史版本选项",
+        "All": "全部",
+        "Check to load all historical revisions (may be slower)": "勾选以加载所有历史版本（可能较慢）"
     }
 }

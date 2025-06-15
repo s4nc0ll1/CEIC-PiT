@@ -315,8 +315,13 @@ def display_visualizations(force_reload=False):
     visualizer = st.session_state.get('visualizer_object')
 
     if force_reload or visualizer is None or visualizer.series_id != series_id_to_visualize:
-        st.subheader(f"{get_translation('Visualizing Series ID:')} {series_id_to_visualize}")
-        current_visualizer = SeriesVisualizer(ceic_client, series_id_to_visualize)
+        if force_reload or visualizer is None or visualizer.series_id != series_id_to_visualize:
+            st.subheader(f"{get_translation('Visualizing Series ID:')} {series_id_to_visualize}")
+            
+            # Determine vintages count based on checkbox state
+            vintages_count = 10000 if st.session_state.load_all_vintages else 20
+            
+            current_visualizer = SeriesVisualizer(ceic_client, series_id_to_visualize, vintages_count)
         with st.spinner(get_translation("Fetching data for Series ID {}...", series_id_to_visualize)):
             current_visualizer.fetch_all_data()
         st.session_state.visualizer_object = current_visualizer
@@ -602,8 +607,29 @@ def main_app():
 
     display_series_selection()
 
-    load_data_disabled = not st.session_state.series_id_for_viz
-    load_data_button = st.button(get_translation("Load Data & Visualize"), disabled=load_data_disabled, key="load_data_visualize_btn")
+    col1, col2, col3 = st.columns([1, 2, 2])
+    
+    with col1:
+        load_data_disabled = not st.session_state.series_id_for_viz
+        load_data_button = st.button(
+            get_translation("Load Data & Visualize"), 
+            disabled=load_data_disabled, 
+            key="load_data_visualize_btn"
+        )
+    
+    with col2:
+        # Initialize session state for the checkbox if needed
+        if 'load_all_vintages' not in st.session_state:
+            st.session_state.load_all_vintages = False
+        
+        # Create the checkbox next to the button
+        st.session_state.load_all_vintages = st.checkbox(
+            get_translation("All"),
+            value=st.session_state.load_all_vintages,
+            key="all_vintages_checkbox",
+            # Add some space above the checkbox
+            help=get_translation("Check to load all historical revisions (may be slower)")
+        )
 
     if load_data_button:
         display_visualizations(force_reload=True)
