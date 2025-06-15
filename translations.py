@@ -94,6 +94,7 @@ TRANSLATIONS = {
         "Failed to extract valid options from {}": "Failed to extract valid options from {}",
         "Select {}:": "Select {}:",
         "Could not generate Python script: 'series.py' is missing.": "Could not generate Python script: 'series.py' is missing.",
+        "Found {} series matching your criteria.": "Found {} series matching your criteria.",
 
     },
     "CN": {
@@ -190,6 +191,7 @@ TRANSLATIONS = {
         "Could not generate Python script: 'series.py' is missing.": "无法生成 Python 脚本：“series.py”缺失。",
         "Select First Date": "选择第一个日期",
         "Select Second Date": "选择第二个日期",
+        "Found {} series matching your criteria.": "找到 {} 个符合您条件的系列",
         "Could not generate comparison for selected dates.": "无法为选定日期生成比较图表。"
     }
 }

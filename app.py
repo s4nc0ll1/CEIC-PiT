@@ -255,7 +255,12 @@ def search_series(keyword, dropdown):
 
 def display_series_selection():
     if st.session_state.series_options:
+        total_series = len(st.session_state.series_options)
         st.subheader(get_translation("Select Series"))
+        
+        # Add info message with total series found
+        st.info(get_translation("Found {} series matching your criteria.", total_series))
+        
         options_keys = list(st.session_state.series_options.keys())
         default_index = 0
         if st.session_state.selected_series_key in options_keys:
@@ -289,8 +294,7 @@ def display_series_selection():
         
         st.session_state.series_id_for_viz = None 
         st.session_state.selected_series_key = None
-
-
+        
 def display_visualizations(force_reload=False):
     series_id_to_visualize = st.session_state.series_id_for_viz
     ceic_client = st.session_state.ceic_client
