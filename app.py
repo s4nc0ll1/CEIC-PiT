@@ -1,3 +1,4 @@
+import io
 import streamlit as st
 from series import SeriesVisualizer
 import plotly.express as px
@@ -9,6 +10,8 @@ import os
 import json
 import sys
 import re 
+from PIL import Image
+import base64
 from script_generator import generate_python_script
 from translations import TRANSLATIONS 
 
@@ -294,7 +297,7 @@ def display_series_selection():
         
         st.session_state.series_id_for_viz = None 
         st.session_state.selected_series_key = None
-        
+
 def display_visualizations(force_reload=False):
     series_id_to_visualize = st.session_state.series_id_for_viz
     ceic_client = st.session_state.ceic_client
@@ -510,28 +513,39 @@ def display_code_export_buttons_sidebar():
     st.sidebar.markdown("---")
     st.sidebar.subheader(get_translation("View Code Examples"))
     
-    current_series_id = st.session_state.get('series_id_for_viz') # Get current ID if available
-
-    # Python Script Button
-    # Generate script: if current_series_id exists, use it, otherwise pass None for a generic script
+    current_series_id = st.session_state.get('series_id_for_viz')
     python_script_content = generate_python_script(str(current_series_id) if current_series_id else None)
-    
     file_name_py = f"ceic_visualize_series_{current_series_id}.py" if current_series_id else "ceic_visualize_series_generic.py"
 
     if "ERROR: The file 'series.py' was not found" in python_script_content:
         st.sidebar.error(get_translation("Could not generate Python script: 'series.py' is missing."))
-        st.sidebar.button(get_translation("🐍 Python Script"), key="python_script_btn_disabled_sidebar", disabled=True)
+        st.sidebar.button(get_translation("Python Script"), key="python_script_btn_disabled_sidebar", disabled=True)
     else:
-        st.sidebar.download_button(
-            label=get_translation("🐍 Download Python Script"),
-            data=python_script_content,
-            file_name=file_name_py,
-            mime="text/x-python",
-            key="download_python_script_btn_sidebar"
+        # Load and encode Python logo
+        python_logo = Image.open("images/python-logo.png")
+        python_logo = python_logo.resize((20, 20))  # Resize to fit in button
+        
+        # Convert to base64 for embedding
+        buffered = io.BytesIO()
+        python_logo.save(buffered, format="PNG")
+        img_str = base64.b64encode(buffered.getvalue()).decode()
+        img_html = f'<img src="data:image/png;base64,{img_str}" style="vertical-align: middle; margin-right: 8px;">'
+        
+        # Create download button with logo
+        st.sidebar.markdown(
+            f'<a href="data:text/plain;base64,{base64.b64encode(python_script_content.encode()).decode()}" '
+            f'download="{file_name_py}" style="text-decoration: none;">'
+            f'<button style="border: 1px solid #e0e0e0; color: black; padding: 10px 20px; '
+            f'text-align: center; text-decoration: none; display: inline-block; font-size: 16px; '
+            f'margin: 4px 2px; cursor: pointer; border-radius: 4px;">'
+            f'{img_html}'
+            f'{get_translation("Download Python Script")}'
+            f'</button></a>',
+            unsafe_allow_html=True
         )
+        
         with st.sidebar.expander(get_translation("View Generated Python Script")):
             st.code(python_script_content, language="python")
-
 
 def main_app():
     _, _, lang_col1, lang_col2 = st.columns([0.7, 0.1, 0.1, 0.1]) 
