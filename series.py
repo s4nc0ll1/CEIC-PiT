@@ -12,13 +12,14 @@ LAVENDER = "#F2CEEF"
 DEEP_PURPLE = "#792D82"
 
 class SeriesVisualizer:
-    def __init__(self, ceic_client, series_id, vintages_count=10000):
+    def __init__(self, ceic_client, series_id, vintages_count=10000, vintages_start_date=None):
         self.ceic_client = ceic_client
         self.series_id = series_id
         self.metadata = None
         self.series_data = None
         self.df_reversed = None
         self.vintages_count = vintages_count
+        self.vintages_start_date = vintages_start_date  
 
     def fetch_metadata(self):
         try:
@@ -38,10 +39,17 @@ class SeriesVisualizer:
 
     def fetch_vintages_data(self):
         try:
-            data = self.ceic_client.series_vintages_as_dict(
-                series_id=self.series_id, 
-                vintages_count=self.vintages_count
-            )
+            # Prepare parameters
+            params = {"series_id": self.series_id}
+            
+            if self.vintages_start_date:
+                # Add start date parameter if provided
+                params["vintages_start_date"] = self.vintages_start_date
+            else:
+                # Only use vintages_count if no start date is provided
+                params["vintages_count"] = self.vintages_count
+            
+            data = self.ceic_client.series_vintages_as_dict(**params)
             df = pd.DataFrame(data)
             df.index = pd.to_datetime(df.index)
             df.columns = pd.to_datetime(df.columns)

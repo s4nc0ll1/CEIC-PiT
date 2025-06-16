@@ -315,13 +315,26 @@ def display_visualizations(force_reload=False):
     visualizer = st.session_state.get('visualizer_object')
 
     if force_reload or visualizer is None or visualizer.series_id != series_id_to_visualize:
-        if force_reload or visualizer is None or visualizer.series_id != series_id_to_visualize:
-            st.subheader(f"{get_translation('Visualizing Series ID:')} {series_id_to_visualize}")
-            
-            # Determine vintages count based on checkbox state
-            vintages_count = 10000 if st.session_state.load_all_vintages else 20
-            
-            current_visualizer = SeriesVisualizer(ceic_client, series_id_to_visualize, vintages_count)
+        st.subheader(f"{get_translation('Visualizing Series ID:')} {series_id_to_visualize}")
+        
+        # Get start date if provided
+        vintages_start_date = None
+        if st.session_state.vintage_start_date:
+            try:
+                # Convert DD/MM/YYYY to YYYY-MM-DD format
+                day, month, year = st.session_state.vintage_start_date.split('/')
+                vintages_start_date = f"{year}-{month}-{day}"
+            except:
+                st.error(get_translation("Invalid date format. Please use DD/MM/YYYY"))
+                return
+        
+        # Create visualizer with parameters
+        current_visualizer = SeriesVisualizer(
+            ceic_client, 
+            series_id_to_visualize,
+            vintages_count=10000 if st.session_state.load_all_vintages else 40,
+            vintages_start_date=vintages_start_date
+        )
         with st.spinner(get_translation("Fetching data for Series ID {}...", series_id_to_visualize)):
             current_visualizer.fetch_all_data()
         st.session_state.visualizer_object = current_visualizer
@@ -607,7 +620,7 @@ def main_app():
 
     display_series_selection()
 
-    col1, col2, col3 = st.columns([1, 2, 2])
+    col1, col2, col3 = st.columns([1, 1, 3])
     
     with col1:
         load_data_disabled = not st.session_state.series_id_for_viz
@@ -627,9 +640,36 @@ def main_app():
             get_translation("All"),
             value=st.session_state.load_all_vintages,
             key="all_vintages_checkbox",
-            # Add some space above the checkbox
-            help=get_translation("Check to load all historical revisions (may be slower)")
+            help=get_translation("Load all historical revisions (may be slower)")
         )
+    
+    with col3:
+        # Initialize session state for start date
+        if 'vintage_start_date' not in st.session_state:
+            st.session_state.vintage_start_date = ""
+        
+        # Create two columns within col3: one for label, one for input
+        label_col, input_col, blank_column = st.columns([1, 2, 4])
+        
+        with label_col:
+            # Display just the label text
+            st.markdown(f"<div style='padding-top: 0.8rem;'>{get_translation('Start Date')}:</div>", 
+                        unsafe_allow_html=True)
+        
+        with input_col:
+            # Create the text input without its own label
+            start_date = st.text_input(
+                " ",  
+                value=st.session_state.vintage_start_date,
+                placeholder="DD/MM/YYYY",
+                key="vintage_start_date_input",
+                help=get_translation("Show revisions starting from this date"),
+                label_visibility="collapsed"  # Hide the label area
+            )
+            st.session_state.vintage_start_date = start_date
+
+    # Add explanatory text below
+    st.caption(get_translation("Choose to show the full history or specify a start date for revisions. Default: last 40 vintages."))
 
     if load_data_button:
         display_visualizations(force_reload=True)

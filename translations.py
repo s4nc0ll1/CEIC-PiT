@@ -98,6 +98,10 @@ TRANSLATIONS = {
         "Vintage Options": "Vintage Options",
         "All": "All",
         "Check to load all historical revisions (may be slower)": "Check to load all historical revisions (may be slower)",
+        "Start Date": "Start Date",
+        "Show revisions starting from this date": "Show revisions starting from this date",
+        "Choose to show the full history or specify a start date for revisions. Default: last 40 vintages.":
+        "Choose to show the full history or specify a start date for revisions. Default: last 40 vintages.",
 
     },
     "CN": {
@@ -197,6 +201,11 @@ TRANSLATIONS = {
         "Could not generate comparison for selected dates.": "无法为选定日期生成比较图表。",
         "Vintage Options": "历史版本选项",
         "All": "全部",
-        "Check to load all historical revisions (may be slower)": "勾选以加载所有历史版本（可能较慢）"
+        "Check to load all historical revisions (may be slower)": "勾选以加载所有历史版本（可能较慢）",
+        "Start Date": "开始日期 (日/月/年)",
+        "Show revisions starting from this date": "显示从此日期开始的修订",
+        "Choose to show the full history or specify a start date for revisions. Default: last 40 vintages.": 
+            "选择显示完整历史或指定修订的开始日期。默认：最近40个版本。",
+        "Load all historical revisions (may be slower)": "加载所有历史版本（速度可能较慢）",
     }
 }
