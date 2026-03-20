@@ -5,4 +5,4 @@ numpy
 pandas
 plotly
 seaborn
-streamlit
+streamlitt>=1.32.0
